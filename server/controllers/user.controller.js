@@ -1,9 +1,11 @@
-import User from "../models/user.model.js";
+import {User} from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import { generateToken } from "../utils/generateToken.js";
 
-// Signup bussnes logic : Backed logic 
+// Signup/Register bussnes logic : Backed logic 
 export const register = async (req,res) => {
     try {
+        // console.log(req.body);
         const {name,email, password} = req.body;
         if(!name || !email || !password){
             return res.status(400).json({
@@ -18,20 +20,23 @@ export const register = async (req,res) => {
                 message: "User already exist with this email."
             })
         }
+        // new user forword to regstion
         const hashedPassword = await bcrypt.hash(password,10)
         await User.create({
             name,
             email,
             password : hashedPassword
-        })
+        })// jab bhi key value same hoti hai tab ek hi value do
         return res.status(201).json({
             success : true,
             message: "Account Created Successfully."
         })
     } catch (error) {
+        console.log(error)
            return res.status(500).json({
              success : false,
-             message : "Failed to register"
+             message : "Failed to register",
+             
            })
     }
 }
@@ -65,6 +70,7 @@ export const login = async (req,res) => {
             });
         }
         // tokan genrat , cookis  , authentication , jwt
+        generateToken(res,user, `Welcome back ${user.name}`)
      } catch (error) {
            return res.status(500).json({
              success : false,

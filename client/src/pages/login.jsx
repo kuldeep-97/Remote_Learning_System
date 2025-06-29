@@ -1,4 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+
+
 import {
   Card,
   CardContent,
@@ -10,71 +13,114 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
-
+import {
+  useLoginUserMutation,
+  useRegisterUserMutation,
+} from "../features/apis/authApi";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Login = () => {
+  // Input fild se data grap krna hai to
+  // I/p var ko get krne ke liye state var bnayege
 
-// Input fild se data grap krna hai to
-// I/p var ko get krne ke liye state var bnayege
+  const [signupInput, setSignupInput] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [loginInput, setLoginInput] = useState({
+    email: "",
+    password: "",
+  });
 
-const [signupInput, setSignupInput] = useState({
-  name: "",
-  email: "",
-  password: "",
-});
-const [loginInput, setLoginInput] = useState({ 
-  email: "", 
-  password: "" 
-});
+  const [
+    registerUser,
+    {
+      data: registerData,
+      error: registerError,
+      isLoading: registerIsLoading,
+      isSuccess: registerIsSuccess,
+    },
+  ] = useRegisterUserMutation();
+  const [
+    loginUser,
+    {
+      data: loginData,
+      error: LoginError,
+      isLoading: loginIsLoading,
+      isSuccess: loginIsSuccess,
+    },
+  ] = useLoginUserMutation();
 
-// I/P file se data get krne ke liye ek change hadler bnayege
+  // I/P file se data get krne ke liye ek change hadler bnayege
 
-const changeInputHandler = (e,type) => {
+  const changeInputHandler = (e, type) => {
+    // const name = e.target.name;
+    // const value = e.target.value;
+    // eshi value ko distructure krke dala hai
+    const { name, value } = e.target;
 
-  // const name = e.target.name;
-  // const value = e.target.value;
-  // eshi value ko distructure krke dala hai 
-   const {name,value} = e.target;
+    if (type === "signup") {
+      setSignupInput({ ...signupInput, [name]: value });
+    } else {
+      setLoginInput({ ...loginInput, [name]: value });
+    }
+  };
 
-   if(type === "signup"){
-    setSignupInput({...signupInput, [name]:value}); 
-   }else{
-    setLoginInput({...loginInput,[name]:value});
-   }
-};
+  // data get ke liye ek fn bnayenge
+  const handleRegistration = async (type) => {
+    const inputData = type === "signup" ? signupInput : loginInput;
+    // console.log(inputData);
+    const action = type === 'signup' ? registerUser : loginUser;
+     await action(inputData);
+  };
+ 
 
- // data get ke liye ek fn bnayenge
-  const handleRegistration = (type) => {
-     const inputData  = type === "signup" ? signupInput : loginInput;
-     console.log(inputData)
-  }
+  useEffect(()=>{
+     
+    // alert("")
+  
+    if(registerIsSuccess && registerData){
+      toast.success(registerData.message || "Signup successfull.")
+    }
+    if(registerError){
+      toast.error(registerData.message || "Signup Fail")
+    }
+    if(loginData && loginIsSuccess){
+      toast.success(loginData.message || "Login successfull.")
+    }
+      if(LoginError){
+      toast.error(loginData.message || "Login Fail")
+    }
+
+  },[loginIsLoading, registerIsLoading, loginData, registerData, LoginError, registerError,])
+
 
   return (
-    <div className="flex  item-center w-full justify-center mt-10 ">
+    <div className="flex  item-center w-full justify-center mt-20 ">
       <Tabs defaultValue="account" className="w-[400px]">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="signup">Signup</TabsTrigger>
           <TabsTrigger value="login">Login</TabsTrigger>
         </TabsList>
 
-         {/* Signup Form */}
+        {/* Signup Form */}
         <TabsContent value="signup">
           <Card>
             <CardHeader>
-              <CardTitle>signup</CardTitle>
+              <CardTitle>Signup</CardTitle>
               <CardDescription>
-                Create a new account and click signup when you're 
-                 done.
+                Create a new account and click signup when you're done.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="space-y-1">
                 <Label htmlFor="name">Name</Label>
-                <Input onChange={(e)=> 
-                changeInputHandler(e,"signup")}
-                name="name"
-                value={signupInput.name}
+                <Input
+                  onChange={(e) => changeInputHandler(e, "signup")}
+                  name="name"
+                  value={signupInput.name}
                   type="text"
                   placeholder="Enter you name"
                   required
@@ -84,34 +130,43 @@ const changeInputHandler = (e,type) => {
                 <Label htmlFor="email">Email</Label>
 
                 <Input
-                  onChange={(e)=> changeInputHandler(e,"signup")}
+                  onChange={(e) => changeInputHandler(e, "signup")}
                   name="email"
                   value={signupInput.email}
                   type="email"
                   placeholder="xyz@gmail.com"
                   required
                 />
-
               </div>
-              
+
               <div className="space-y-1">
                 <Label htmlFor="password">Password</Label>
-                <Input  onChange={(e)=> changeInputHandler(e,"signup")}
-                type="password"
-                name="password"
-                value={signupInput.password}
-                 placeholder="xyz" 
-                 required />
+                <Input
+                  onChange={(e) => changeInputHandler(e, "signup")}
+                  type="password"
+                  name="password"
+                  value={signupInput.password}
+                  placeholder="xyz"
+                  required
+                />
               </div>
             </CardContent>
 
             <CardFooter>
-              <Button onClick={() => handleRegistration("signup")} >signup</Button>
+              <Button  onClick={() => handleRegistration("signup")}>
+                {
+                  registerIsLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Please wait
+                    </>
+                  ): "Signup"
+                }
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
 
-               {/* Login Form */}
+        {/* Login Form */}
         <TabsContent value="login">
           <Card>
             <CardHeader>
@@ -124,9 +179,9 @@ const changeInputHandler = (e,type) => {
               <div className="space-y-1">
                 <Label htmlFor="current">Email</Label>
                 <Input
-                  onChange={(e)=> changeInputHandler(e,"login")}
-                 name="email"
-                value={loginInput.email}
+                  onChange={(e) => changeInputHandler(e, "login")}
+                  name="email"
+                  value={loginInput.email}
                   type="email"
                   placeholder="xyz@gmail.com"
                   required
@@ -134,17 +189,26 @@ const changeInputHandler = (e,type) => {
               </div>
               <div className="space-y-1">
                 <Label htmlFor="password">Password</Label>
-                <Input 
-                 onChange={(e)=> changeInputHandler(e,"login")}
-                 name="password"
-                 value={loginInput.password}
-                 type="password" 
-                 placeholder="xyz" 
-                 required />
+                <Input
+                  onChange={(e) => changeInputHandler(e, "login")}
+                  name="password"
+                  value={loginInput.password}
+                  type="password"
+                  placeholder="xyz"
+                  required
+                />
               </div>
             </CardContent>
             <CardFooter>
-              <Button  onClick={() => handleRegistration("login")}>Login</Button>
+              <Button  onClick={() => handleRegistration("login")}>
+                {
+                  loginIsLoading ? (
+                  <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Please wait
+                  </>
+                  ) : "Login"
+                }
+              </Button>  
             </CardFooter>
           </Card>
         </TabsContent>
@@ -156,11 +220,6 @@ const changeInputHandler = (e,type) => {
 export default Login;
 
 // add this : npx shadcn@latest add tabs
-
-
-
-
-
 
 // import { Button } from "@/components/ui/button";
 // import {

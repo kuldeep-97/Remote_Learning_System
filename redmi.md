@@ -8,7 +8,7 @@
 
 
 
-# Client ***
+# Client 
 
 * Frontend UI = Shadcn UI useing this project for building web 
   pages
@@ -55,7 +55,7 @@
 
 
 
-# Server ***
+# Server
 
  1) npm -y init 
  2) creat index.js file 
@@ -71,6 +71,34 @@
  7) Made a Schema creat
  8) Ragestration Busness logics : Backend Apis : controller folder me Busness logics write krte hia 
 
+# Data Base : 
+ 
+  * DB Connection: 
+   1) Creat database folder : 
+     - dbconnect.js file 
+   2) Creat db Shaema : 
+     - do trike ke user hai : mtlab do trike ke account managment system hai : student , instructor.
+
+ * Authentication : token jwt 
+
+
+
+# Api's Test : 
+ * All api's are properly work then ab api ko frontend se intrigaet ya connect kr hai 
+
+
+# Front end Intrigation :
+
+
+# RTK Query : api intrigation 
+ * Rtk query is a powerful data fetching and caching tool. 
+ * caching : same profile ko bar bar re-fetching se privent krta hai and jo un-nesasory api call se bchata hai 
+* Redux setup 
+
+
+
+# Navbar 
+
 
 
  # github : 
@@ -79,3 +107,32 @@
 git branch -M main
 
 git push -u origin main
+
+
+
+
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
