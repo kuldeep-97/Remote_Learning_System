@@ -12,20 +12,18 @@ import React from "react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import DarkMode from "@/DarkMode";
-import { Label } from "@radix-ui/react-label";
-import { Input } from "@/components/ui/input";
 
 import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
 import { Separator } from "@radix-ui/react-dropdown-menu";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const user = true;
@@ -54,9 +52,9 @@ const Navbar = () => {
               <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>My Profile</DropdownMenuItem>
+                  <DropdownMenuItem><Link to={"/My-learning"}>My Learning</Link> </DropdownMenuItem>
 
-                  <DropdownMenuItem>Edit Profile</DropdownMenuItem>
+                  <DropdownMenuItem><Link to={"profile"}>Edit Profile</Link></DropdownMenuItem>
 
                   <DropdownMenuItem>Log out</DropdownMenuItem>
                 </DropdownMenuGroup>
@@ -86,7 +84,7 @@ const Navbar = () => {
 export default Navbar;
 
 const MobileNevbar = () => {
-    const role = "instructor";
+  const role = "instructor";
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -101,26 +99,23 @@ const MobileNevbar = () => {
       <SheetContent className="flex flex-col">
         <SheetHeader className="flex flex-row items-center justify-between mt-2">
           <SheetTitle>E-Learning</SheetTitle>
-          <DarkMode/>
+          <DarkMode />
         </SheetHeader>
 
-        <Separator className="mr-2"/>
+        <Separator className="mr-2" />
         <nav className="flex flex-col space-y-5 ">
-            <span>My Learning</span>
-            <span>Edit Profile</span>
-            <span>Log out</span>
+          <span>My Learning</span>
+          <span>Edit Profile</span>
+          <span>Log out</span>
         </nav>
-       
-       {
-        role === "instructor" && (
-            <SheetFooter>
+
+        {role === "instructor" && (
+          <SheetFooter>
             <SheetClose>
-                 <Button type="submit">Dashboard</Button>
+              <Button type="submit">Dashboard</Button>
             </SheetClose>
-        </SheetFooter>
-        )
-       }
-      
+          </SheetFooter>
+        )}
       </SheetContent>
     </Sheet>
   );

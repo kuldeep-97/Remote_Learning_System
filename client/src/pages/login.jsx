@@ -19,6 +19,7 @@ import {
 } from "../features/apis/authApi";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   // Input fild se data grap krna hai to
@@ -53,6 +54,8 @@ const Login = () => {
     },
   ] = useLoginUserMutation();
 
+  const navigate = useNavigate()
+
   // I/P file se data get krne ke liye ek change hadler bnayege
 
   const changeInputHandler = (e, type) => {
@@ -85,13 +88,14 @@ const Login = () => {
       toast.success(registerData.message || "Signup successfull.")
     }
     if(registerError){
-      toast.error(registerData.message || "Signup Fail")
+      toast.error(registerData.message || "Signup Fail.")
     }
     if(loginData && loginIsSuccess){
       toast.success(loginData.message || "Login successfull.")
+      navigate("/");
     }
       if(LoginError){
-      toast.error(loginData.message || "Login Fail")
+      toast.error(loginData.message || "Login Failed.")
     }
 
   },[loginIsLoading, registerIsLoading, loginData, registerData, LoginError, registerError,])
