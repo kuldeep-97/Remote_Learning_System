@@ -8,6 +8,7 @@ import connectDB from "./database/db.js";
 import userRoute from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import courseRoute from "./routes/course.route.js"
 
 dotenv.config({});
 
@@ -27,6 +28,7 @@ app.use(cors({
 
 // 4. apis  Routes
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/course", courseRoute);
 // http://localhost:8080/api/v1/user/register : api
 
 // app.get("/home", (_, res) => {

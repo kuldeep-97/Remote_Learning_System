@@ -13,12 +13,79 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import { Loader2 } from "lucide-react";
 import { Input } from "postcss";
 // import {  } from "@radix-ui/react-dialog";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Course from "./Course";
+import {
+  useLoadUserQuery,
+  useUpdateUserMutation,
+} from "@/features/apis/authApi";
+import { useFetcher } from "react-router-dom";
+import { toast } from "sonner";
+
+
 
 const Profile = () => {
-  const isLoading = false;
-  const inrolledCourses = [1, 2];
+  const [name, setName] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState("");
+
+  
+
+  // mutation casse me [] & query case {} me ye lgta hai
+  const { data, isLoading, error, refetch} = useLoadUserQuery();
+  const [
+    updateUser,
+    {
+      data: updateUserData,
+      isLoading: updateUserIsLoading,
+      error: updateUserError,
+      isSuccess,
+      isError
+    },
+  ] = useUpdateUserMutation();
+
+ 
+  const onchangeHandler = (e) => {
+    const file = e.target.files?.[0];
+    // console.log("file not exitss",file)
+    if (file) setProfilePhoto(file);
+  };
+
+  // const isLoading = false;
+  
+  // if (error) return <div>Error: {error.message}</div>;
+  // const inrolledCourses = [1, 2];
+
+ 
+
+  const updateUserHandler = async () => {
+    console.log(name,profilePhoto);
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("profilePhoto", profilePhoto);
+    await updateUser(formData);
+  };
+
+  useEffect(()=>{
+    refetch();
+  },[])
+
+  useEffect(() => {
+    if (isSuccess) {
+      refetch();
+      toast.success(data.message || "Profile update.");
+    }
+    if (isError) {
+      toast.error(error?.message || "Failed to Update Profile");
+    }
+  }, [error, updateUserData, isSuccess, isError]);
+
+
+    if (isLoading) return <h1>Profile Loading...</h1>;
+   if (error) return <p>Error: {error.message}</p>;
+   if (!data) return <p>No data found</p>; 
+
+   const { user } = data;
+
   return (
     <div className=" max-w-4xl mx-auto px-4 my-24">
       <h1 className="font-bold text-2xl text-center md:text-left">PROFILE</h1>
@@ -26,7 +93,7 @@ const Profile = () => {
         <div className="flex flex-col items-center">
           <Avatar>
             <AvatarImage
-              src="https://github.com/shadcn.png"
+              src={user?.photoUrl || "https://github.com/shadcn.png"}
               className="h-24 w-24 md:h-32 md:w-32 rounded-full mt-4"
             />
             <AvatarFallback>CN</AvatarFallback>
@@ -37,7 +104,7 @@ const Profile = () => {
             <h1 className="font-semibold text-gray-1000 dark:text-gray-200">
               Name:{" "}
               <span className="font-normal text-gray-800 dark:text-gray-200 ml-2">
-                Kuldeep Kumawat
+                {user?.name}
               </span>
             </h1>
           </div>
@@ -45,7 +112,7 @@ const Profile = () => {
             <h1 className="font-semibold text-gray-1000 dark:text-gray-200">
               Email:{" "}
               <span className="font-normal text-gray-800 dark:text-gray-200 ml-2">
-                kuldeepkumawat1250@gmail.com
+                {user?.email}
               </span>
             </h1>
           </div>
@@ -53,7 +120,7 @@ const Profile = () => {
             <h1 className="font-semibold text-gray-1000 dark:text-gray-200">
               Role:{" "}
               <span className="font-normal text-gray-800 dark:text-gray-200 ml-2">
-                Instructor{" "}
+                {user?.role.toUpperCase() || "Student"}
               </span>
             </h1>
           </div>
@@ -80,17 +147,24 @@ const Profile = () => {
                   <input
                     type="text"
                     placeholder="Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     className="col-span-3"
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label>Profile Photo</Label>
-                  <input type="file" accept="image/*" className="col-span-3" />
+                  <input
+                    onChange={onchangeHandler}
+                    type="file"
+                    accept="image/*"
+                    className="col-span-3"
+                  />
                 </div>
               </div>
               <DialogFooter>
-                <Button disabled={isLoading}>
-                  {isLoading ? (
+                <Button disabled={updateUserIsLoading} onClick={updateUserHandler}>
+                  {updateUserIsLoading ? (
                     <>
                       <Loader2
                         className="mr-2 h-4
@@ -110,11 +184,13 @@ const Profile = () => {
       <div>
         <h1 className="font-medium text-lg">Course</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
-          {inrolledCourses.length === 0 ? (
+          {user?.enrolledCourses.length === 0 ? (
             <h1>You have not enrolled yet</h1>
           ) : (
-            inrolledCourses.map((Coursee, index) => <Course key={index} />)
-          )} 
+            user?.enrolledCourses.map((Coursee) => (
+              <Course Coursee={Coursee} key={Coursee._id} />
+            ))
+          )}
         </div>
       </div>
     </div>

@@ -52,6 +52,9 @@
      client/src/pages/ pages
 
 
+ * ) Component resusabiligy : ek hi componet ko multiplel TIME  kahi bhia kisi bhai componet me  use krna skte hai 
+
+
 
 
 
@@ -101,15 +104,18 @@
 
 
 
+
+
+# cloudinarly : therd party laibrary 
+  * use photo and video storage 
+
+
  # github : 
  git remote add origin https://github.com/kuldeep-97/Remote_Learning_System.git
 
 git branch -M main
 
 git push -u origin main
-
-
-
 
 
 # Logs
