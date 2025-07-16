@@ -14,7 +14,7 @@ import { useGetCreatorCoursesQuery } from "@/features/apis/courseApi";
 import { Edit } from "lucide-react";
 
 import React from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link,  useNavigate } from "react-router-dom";
 
 
 // const invoices = [
@@ -68,6 +68,7 @@ const CourseTable = () => {
 
     if(isLoading) return <h1>Loading...</h1>
     //  console.log("data", data)
+    
 
     return (
         <div>
@@ -85,18 +86,18 @@ const CourseTable = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.courses.map((invoice) => (
-          <TableRow key={invoice.id}>
-            <TableCell>{invoice?.coursePrice || "NA"}</TableCell>
-            <TableCell><Badge>{invoice.isPublished ? "Published" : "Draft"}</Badge></TableCell>
-            <TableCell className="font-medium">{invoice.courseTitle}</TableCell>
+        {data?.courses.map((course) => (
+          <TableRow key={course?._id}>
+            <TableCell>{course?.coursePrice || "NA"}</TableCell>
+            <TableCell><Badge>{course?.isPublished ? "Published" : "Draft"}</Badge></TableCell>
+            <TableCell className="font-medium">{course?.courseTitle}</TableCell>
             <TableCell className="text-right">
-              <Button><Edit/></Button>
+              <Button onClick={()=> navigate(`${course?._id}`)}><Edit /></Button>
             </TableCell>
           </TableRow>
-        ))}
+        ))} 
       </TableBody>
-    </Table>
+    </Table> 
         </div>
     )
 }

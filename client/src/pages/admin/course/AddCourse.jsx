@@ -75,11 +75,7 @@ const AddCourse = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Category</SelectLabel>
-                <SelectItem
-                  value="Next JS"
-                >
-                  Next JS
-                </SelectItem>
+                <SelectItem value="Next JS">Next JS</SelectItem>
                 <SelectItem value="React JS">React JS</SelectItem>
                 <SelectItem value="Node JS">Node JS</SelectItem>
 
