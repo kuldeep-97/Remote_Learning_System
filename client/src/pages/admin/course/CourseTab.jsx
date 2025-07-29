@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import RichTextEditor from "@/components/RichTextEditor";
@@ -22,12 +22,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEditCourseMutation, useGetCoursebyIdQuery, usePublishCourseMutation } from "@/features/apis/courseApi";
+import { toast } from "sonner";
 
 const CourseTab = () => {
   const [input, setInput] = useState({
     courseTitle: "",
-    Subtitle: "",
+    subTitle: "",
     description: "",
     category: "",
     courseLevel: "",
@@ -35,14 +37,104 @@ const CourseTab = () => {
     courseThumbnail: "",
   });
 
+  const params = useParams();
+  const courseId = params.courseId;
+
+  const {data:CoursebyIdData, isLoading:getCoursebyIslooding , refetch} = useGetCoursebyIdQuery(courseId);
+
+  const [publishCourse, {}] = usePublishCourseMutation();
+
+  const course = CoursebyIdData?.course;
+  useEffect(()=>{
+       if(course){
+        setInput({
+    courseTitle: course.courseTitle,
+    subTitle: course.subTitle,
+    description: course.description,
+    category: course.category,
+    courseLevel: course.courseLevel,
+    coursePrice: course.coursePrice,
+    courseThumbnail: course.courseThumbnail
+        })
+       }
+  } , [CoursebyIdData])
+
+  const [previewThumbnail, setPreviewThumbnail] = useState("")
+   
+
+
   const changeEventHandler = (e) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
   };
 
-  const navigation  =  useNavigate();
-  const isPublished = true;
-  const isLoading = false;
+ const navigation  =  useNavigate();
+
+  const [editCourse, {data, isLoading, isSuccess, error}] = useEditCourseMutation();
+
+  const selectCategory = (value) => {
+    setInput({...input, category:value});
+  }
+
+    const slectCourseLevel = (value) => {
+    setInput({...input, courseLevel:value});
+  }
+
+  const selectThumbnail = (e) => {
+    const file = e.target.files?.[0];
+    if(file){
+      setInput({...input,courseThumbnail:file});
+      const fileReader = new FileReader();
+      fileReader.onloadend = () => setPreviewThumbnail(fileReader.result)
+      fileReader.readAsDataURL(file)
+    }
+    // use file reader : file reader img ko data url convert krta hia , jab device se img get krte hai to vo dairect show  nhi kr skte brwoser pe uss img ko show krne ke liye data url me convert krna pda hai  that resion file reader use hota hai.
+
+  } 
+
+  const updataCourse = async() => {
+    console.log(input)
+    const formData = new FormData();
+    formData.append("courseTitle", input.courseTitle);
+    formData.append("subTitle", input.subTitle);
+    formData.append("description", input.description);
+    formData.append("category", input.category);
+    formData.append("courseLevel", input.courseLevel);
+    formData.append("coursePrice", input.coursePrice);
+    formData.append("courseThumbnail", input.courseThumbnail);
+
+    await editCourse({formData,courseId})
+  };
+
+
+  const publishStatusHandler = async (action) => {
+      try {
+        const response = await publishCourse({courseId, query:action});
+        if(response.data){
+          refetch();
+          toast.success(response.data.message);
+        }
+      } catch (error) {
+        toast.error("Failed to publish or unpublish course")
+      }
+  };
+
+
+  useEffect(()=> {
+    if(isSuccess){
+      toast.success(data.message || "Course update")
+    }
+    if(error) {
+      toast.error(error.data.message || "Faild to update course")
+    }
+
+  },[isSuccess, error])
+
+  if(getCoursebyIslooding) return <h1>Loading...</h1>
+
+  
+  // const isPublished = true;
+  // const isLoading = false;
 
   return (
     <Card>
@@ -55,8 +147,8 @@ const CourseTab = () => {
         </div>
 
         <div className="space-x-2 ">
-          <Button variant="outline">
-            {isPublished ? "Unpublished" : "Publish"}
+          <Button disabled={CoursebyIdData?.course.lectures.length === 0} variant="outline" onClick={()=> publishStatusHandler(CoursebyIdData?.course.isPublished ? "false" : "true" )}>
+            {CoursebyIdData?.course.isPublished ? "Unpublished" : "Publish"}
           </Button>
 
           <Button>Remove Course</Button>
@@ -79,8 +171,8 @@ const CourseTab = () => {
             <Label>Subtitle</Label>
             <Input
               type="text"
-              name="subtitle"
-              value={input.Subtitle}
+              name="subTitle"
+              value={input.subTitle}
               onChange={changeEventHandler}
               placeholder="Ex. Become a Fullstack developer from zero to hero in 7 months"
             />
@@ -93,7 +185,7 @@ const CourseTab = () => {
           <div className="flex items-center gap-5">
             <div>
               <Label>Categroy</Label>
-              <Select>
+              <Select onValueChange={selectCategory}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Select a Category" />
                 </SelectTrigger>
@@ -135,7 +227,7 @@ const CourseTab = () => {
             </div>
             <div> 
               <Label>Course Level</Label>
-              <Select>
+              <Select onValueChange={slectCourseLevel}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Select a Course Level" />
                 </SelectTrigger>
@@ -164,14 +256,19 @@ const CourseTab = () => {
           </div>
             <div>
                 <Label>Course Thumbnail</Label>
-                <Input 
+                <Input onChange={selectThumbnail}
                 type="file"
                 accept="image/*"
                 className="w-fit"/>
+                {
+                  previewThumbnail && (
+                    <img src={previewThumbnail} className="e-64 my-2" alt="Course Thumbnail"/>
+                  )
+                }
             </div>
             <div>
                 <Button onClick={()=> navigation("/admin/course")} variant="outline" >Cancel</Button>
-                <Button disabled={isLoading}>
+                <Button disabled={isLoading} onClick={updataCourse}>
                     {
                         isLoading ? (
                             <>
@@ -190,3 +287,4 @@ const CourseTab = () => {
 export default CourseTab;
 
 // componet folder me vahi component file hoti hai jeseko bar bar use kr sake ya vo file reusable ho ok
+// add exta to 849
