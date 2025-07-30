@@ -48,47 +48,45 @@ const appRouter = createBrowserRouter([
         path: "profile",
         element: <Profile />,
       },
-      
-       {
-            path:"course-detail/:courseId",
-            element:<CourseDetail/>
-       },
+      {
+        path: "course-detail/:courseId",
+        element: <CourseDetail />
+      },
+      {
+        path: "course-progress/:courseId",
+        element: <CourseProgress />
+      },
 
-        {
-            path:"course-progress/:courseId",
-            element:<CourseProgress/>
-       },
-       
       // admin routes start from here
       {
-        path:"admin",
-        element:<Sidebar/>,
-        children:[
+        path: "admin",
+        element: <Sidebar />,
+        children: [
           {
-            path:"dashboard",
-            element:<Dashboard/>
-          },
-          {
-            path:"course",
-            element:<CourseTable/>
+            path: "dashboard",
+            element: <Dashboard />
           },
           {
-            path:"course/create",
-            element:<AddCourse/>
+            path: "course",
+            element: <CourseTable />
           },
           {
-            path:"course/:courseId",
-            element:<EditCourse/>
-          },
-              {
-            path:"course/:courseId/lecture",
-            element:<CreateLecture/>
+            path: "course/create",
+            element: <AddCourse />
           },
           {
-            path:"course/:courseId/lecture/:lectureId",
-            element:<EditLecture/>
+            path: "course/:courseId",
+            element: <EditCourse />
           },
-         
+          {
+            path: "course/:courseId/lecture",
+            element: <CreateLecture />
+          },
+          {
+            path: "course/:courseId/lecture/:lectureId",
+            element: <EditLecture />
+          },
+
         ]
       }
     ],

@@ -18,7 +18,6 @@ const PerchesCourse = ({ courseId }) => {
         if (isSuccess) {
              console.log("Stripe data:", data?.url); 
             if (data?.url) {
-                
                 window.location.href = data.url; // Redirect to stripe checkout
             } else {
                 toast.error("Invalid response from sever.");
