@@ -103,7 +103,7 @@ export const getUserProfile = async (req,res) => {
     try {
         // Middlware
         const userId = req.id;
-        const user = await User.findById(userId).select("-password")
+        const user = await User.findById(userId).select("-password").populate("enrolledCourses")
         if(!user){
             return res.status(400).json({
                 message:"Profile not found",

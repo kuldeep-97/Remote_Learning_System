@@ -22,12 +22,12 @@ export const createCheckoutSession = async (req, res) => {
       courseId,
       userId,
       amount: course.coursePrice,
-      status: 'pending'
+      status: "pending",
     });
 
     // Create a stripe checkout session
     const session = await stripe.checkout.sessions.create({
-     payment_method_types: ["card"],
+      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
@@ -44,7 +44,7 @@ export const createCheckoutSession = async (req, res) => {
 
       mode: "payment",
       success_url: `${process.env.FRONTEND_URL}/${courseId}`, //once payment
-      cancel_url: `${process.env.FRONTEND_URL}/${courseId}`,
+      cancel_url: `${process.env.FRONTEND_URL2}/${courseId}`,
       metadata: {
         courseId: courseId,
         userId: userId,
@@ -53,7 +53,6 @@ export const createCheckoutSession = async (req, res) => {
         allowed_countries: ["IN"], // Optionally restict allowed countires
       },
     });
-    
 
     if (!session.url) {
       return res.status(400).json({
@@ -74,9 +73,6 @@ export const createCheckoutSession = async (req, res) => {
     console.log(error);
   }
 };
-
-
-
 
 export const stripeWebhook = async (req, res) => {
   let event;
@@ -146,5 +142,52 @@ export const stripeWebhook = async (req, res) => {
     }
   } else {
     return res.status(200).json({ message: "Event type not handled" });
+  }
+};
+
+// status completed or not
+export const getCourseDetailWithPurchaseStatus = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.id;
+
+    const course = await Course.findById(courseId)
+      .populate({ path: "creator" })
+      .populate({ path: "lectures" });
+
+    // check course purchased or not
+    const purchased = await CoursePurchase.findOne({ userId, courseId });
+
+    if (!course) {
+      return res.status(404).json({
+        message: "course not purchased",
+      });
+    }
+
+    return res.status(200).json({
+      course,
+      purchased: purchased ? true : false,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// Display all courses in deshbord
+export const getAllPerchasedCoruse = async (_, res) => {
+  try {
+    const purchasedCourses = await CoursePurchase.find({
+      status: "completed",
+    }).populate("courseId");
+    if (!purchasedCourses) {
+      return res.status(404).json({
+        purchasedCourses: [],
+      });
+    }
+    return res.status(200).json({
+      purchasedCourses,
+    });
+  } catch (error) {
+    console.log(error);
   }
 };

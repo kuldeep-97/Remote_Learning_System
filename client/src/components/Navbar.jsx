@@ -1,3 +1,5 @@
+import { Menu, School } from "lucide-react";
+import React, { useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,13 +8,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Menu, School } from "lucide-react";
-import React, { useEffect } from "react";
+} from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import DarkMode from "@/DarkMode";
-
 import {
   Sheet,
   SheetClose,
@@ -24,82 +23,89 @@ import {
 } from "./ui/sheet";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Link, useNavigate } from "react-router-dom";
+
 import { toast } from "sonner";
-import { useLogOutUserMutation } from "@/features/apis/authApi";
 import { useSelector } from "react-redux";
+import { useLogOutUserMutation } from "@/features/apis/authApi";
 
 const Navbar = () => {
-  // const user = true;
-  const {user} = useSelector(store=>store.auth);
-  const [logoutUser, {data,isSuccess}] = useLogOutUserMutation();
+  const { user } = useSelector((store) => store.auth);
+  const [logoutUser, { data, isSuccess }] = useLogOutUserMutation();
   const navigate = useNavigate();
   const logoutHandler = async () => {
     await logoutUser();
-  }   
+  };
 
-  // console.log("Navedata",user)
-
-  useEffect(()=> {
-    if(isSuccess){
-      toast.success(data.message || "User log out. ")
-      navigate("/login")
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data?.message || "User log out.");
+      navigate("/login");
     }
-  }, [isSuccess])
+  }, [isSuccess]);
 
   return (
-    <div className="h-16 dark:bg-[#0A0A0A] bg-white border-b  dark:border-b-gray-800 border-b-gray-200 fixed top-0 left-0 right-0 duration-300 z-10">
+    <div className="h-16 dark:bg-[#020817] bg-white border-b dark:border-b-gray-800 border-b-gray-200 fixed top-0 left-0 right-0 duration-300 z-10">
       {/* Desktop */}
-      <div className="max-w-7xl mx-auto  hidden md:flex justify-between items-center gap-10 h-full">
+      <div className="max-w-7xl mx-auto hidden md:flex justify-between items-center gap-10 h-full">
         <div className="flex items-center gap-2">
           <School size={"30"} />
-        <Link to={"/"}><h1 className="hidden md:block font-extrabold text-2xl">
-            E-Learning
-          </h1></Link>  
+          <Link to="/">
+            <h1 className="hidden md:block font-extrabold text-2xl">
+              R-Learning
+            </h1>
+          </Link>
         </div>
-
-        {/* User icons and dark mode icon : Drop down */}
-        <div className="flex items-center gap-7">
+        {/* User icons and dark mode icon  */}
+        <div className="flex items-center gap-8">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar>
-                  <AvatarImage src={user?.photoUrl ||   "https://github.com/shadcn.png"} />
-                  <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage
+  src={user?.photoUrl || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+  alt="@shadcn"
+/>
+                  <AvatarFallback>NA</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem><Link to={"/My-learning"}>My Learning</Link> </DropdownMenuItem>
-
-                  <DropdownMenuItem><Link to={"profile"}>Edit Profile</Link></DropdownMenuItem>
-
-                  <DropdownMenuItem onClick={logoutHandler}>Log out</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to="my-learning">My learning</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    {" "}
+                    <Link to="profile">Edit Profile</Link>{" "}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logoutHandler}>
+                    Log out
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
-                 {
-                  user.role === "instructor" && (
-                    <>
-                      <DropdownMenuSeparator />
-                <DropdownMenuItem>Dasboard</DropdownMenuItem>
-                    </>
-                  )
-                 }
-              
+                {user?.role === "instructor" && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem><Link to="/admin/dashboard">Dashboard</Link></DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={() => navigate("/login")}>Login</Button>
+              <Button variant="outline" onClick={() => navigate("/login")}>
+                Login
+              </Button>
               <Button onClick={() => navigate("/login")}>Signup</Button>
             </div>
           )}
-          <DarkMode></DarkMode>
+          <DarkMode />
         </div>
       </div>
-      {/* Mobile device */}
+      {/* Mobile device  */}
       <div className="flex md:hidden items-center justify-between px-4 h-full">
-        <h1 className="font-extrabold text-2xl">E-learning</h1>
-        <MobileNevbar />
+        <h1 className="font-extrabold text-2xl">R-learning</h1>
+        <MobileNavbar user={user}/>
       </div>
     </div>
   );
@@ -107,14 +113,15 @@ const Navbar = () => {
 
 export default Navbar;
 
-const MobileNevbar = () => {
-  const role = "instructor";
+const MobileNavbar = ({user}) => {
+  const navigate = useNavigate();
+  
   return (
     <Sheet>
       <SheetTrigger asChild>
         <Button
           size="icon"
-          className="rounded-full bg-gray-100 hover:bg-gray-200"
+          className="rounded-full hover:bg-gray-200"
           variant="outline"
         >
           <Menu />
@@ -122,21 +129,19 @@ const MobileNevbar = () => {
       </SheetTrigger>
       <SheetContent className="flex flex-col">
         <SheetHeader className="flex flex-row items-center justify-between mt-2">
-          <SheetTitle>E-Learning</SheetTitle>
+          <SheetTitle> <Link to="/">R-Learning</Link></SheetTitle>
           <DarkMode />
         </SheetHeader>
-
         <Separator className="mr-2" />
-        <nav className="flex flex-col space-y-5 ">
-          <span>My Learning</span>
-          <span>Edit Profile</span>
-          <span>Log out</span>
+        <nav className="flex flex-col space-y-4">
+          <Link to="/my-learning">My Learning</Link>
+          <Link to="/profile">Edit Profile</Link>
+          <p>Log out</p>
         </nav>
-
-        {role === "instructor" && (
+        {user?.role === "instructor" && (
           <SheetFooter>
-            <SheetClose>
-              <Button type="submit">Dashboard</Button>
+            <SheetClose asChild>
+              <Button type="submit" onClick={()=> navigate("/admin/dashboard")}>Dashboard</Button>
             </SheetClose>
           </SheetFooter>
         )}

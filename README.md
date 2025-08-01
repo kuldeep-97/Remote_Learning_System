@@ -65,5 +65,5 @@ Stripe's test mode is used for secure payments.
 
 README.md intentionally excludes sensitive .env configs (kept in .gitignore).
 
-
+// server side
 # stripe listen --forward-to http://localhost:8080/api/v1/purchase/webhook

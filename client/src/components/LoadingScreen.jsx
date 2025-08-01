@@ -3,11 +3,11 @@ import React from "react";
 
 const LoadingScreen = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-300">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-300 dark:bg-gray-600">
       <Loader className="animate-spin h-28 w-28 text-black-900 " />
-      <p className="mt-4 text-lg font-semibold text-gray-800">
+      <p className="mt-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
         Loauding please waite...
-      </p>
+      </p> 
     </div>
   );
 };
